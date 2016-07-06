@@ -92,7 +92,7 @@ Options:
 
 	/* Register handlers */
 	http.HandleFunc(*path, handleScan)
-	http.HandleFunc(*path+"/query", query)
+	http.HandleFunc(*path+"/res/", query)
 
 	/* Open Database */
 	var err error
