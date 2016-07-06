@@ -223,13 +223,13 @@ func openPortsReport(m map[int][]byte, start time.Time) []byte {
 	report := &bytes.Buffer{}
 	fmt.Fprintf(
 		report,
-		"Scan finished at %v",
+		"Scan finished at %v\n\n",
 		time.Now().UTC().Format(time.RFC3339),
 	)
 
 	/* No ports is an easy case */
 	if 0 == len(m) {
-		fmt.Fprintf(report, "\n\nNo ports open.")
+		fmt.Fprintf(report, "No ports open.\n\n")
 		return report.Bytes()
 	}
 
@@ -241,8 +241,8 @@ func openPortsReport(m map[int][]byte, start time.Time) []byte {
 	sort.Ints(os)
 
 	/* Header */
-	fmt.Fprintf(report, "\n\n  Port | Banner")
-	fmt.Fprintf(report, "\n-------+-------")
+	fmt.Fprintf(report, "Port   | Banner\n")
+	fmt.Fprintf(report, "-------+-------\n")
 
 	/* Add each port to the list */
 	for _, o := range os {
@@ -254,7 +254,7 @@ func openPortsReport(m map[int][]byte, start time.Time) []byte {
 			banner = fmt.Sprintf("%q", m[o])
 		}
 		/* Add to report */
-		fmt.Fprintf(report, "\n%-6v | %v", o, banner)
+		fmt.Fprintf(report, "%-6v | %v\n", o, banner)
 	}
 
 	return report.Bytes()
@@ -426,3 +426,5 @@ func updateAverages(sd time.Duration) {
 		time.Duration(NSCAN+1)
 	NSCAN++
 }
+
+/* TODO: List scanned hosts */
