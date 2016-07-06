@@ -2,10 +2,9 @@ cgiscan
 =======
 CGI Service to portscan and bannergrab the requestor
 
-When the CGI script is run (by default by making a request to `/cgiscan`), it
-fires off a scan of the requestor's TCP ports (or queues it if a scan's
-already running).  The scan is only started if a `yes` parameter is supplied
-in the request (i.e. `/cgiscan?yes`).
+When asked (by default via `/cgiscan/scan`) it will queue and eventually
+synscan the requestor's TCP ports, and grab banner for any ports to which it
+can make a connection.  Please see `/cgiscan/help` for more queryable URLs.
 
 This is intended for easy, lightweight self-service scanning for users setting
 up servers, VMs, etc..  After a scan has been requested, it's status can be
