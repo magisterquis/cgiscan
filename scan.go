@@ -304,6 +304,8 @@ func handleScan(w http.ResponseWriter, req *http.Request) {
 			wt,
 		)
 	} else { /* Report last results */
+		u := req.URL.String() + "?yes"
+		qmsg = fmt.Sprintf("<A HREF=\"%v\">%v</A> to (re)scan", u, u)
 		debug("%v Reporting results", ip)
 	}
 
@@ -427,4 +429,4 @@ func updateAverages(sd time.Duration) {
 	NSCAN++
 }
 
-/* TODO: List scanned hosts */
+/* TODO: Redirect back to non-?yes */
