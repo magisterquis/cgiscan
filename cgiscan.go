@@ -96,6 +96,7 @@ Options:
 	http.HandleFunc(URLPATH, handleScan)
 	http.HandleFunc(URLPATH+"/res/", query)
 	http.HandleFunc(URLPATH+"/list", listScanned)
+	http.HandleFunc(URLPATH+"/delete", deleteResult)
 
 	/* Open Database */
 	var err error
