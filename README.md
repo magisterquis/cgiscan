@@ -30,7 +30,7 @@ Add a directory in httpd's chroot for `cgiscan`
 ```bash
 doas mkdir /var/www/run/cgiscan
 doas chown www:www /var/www/run/cgiscan
-doas chmod 0700 /var/www/run/cgiscan
+doas chmod 0755 /var/www/run/cgiscan
 ```
 
 ### Configure `httpd(8)`
