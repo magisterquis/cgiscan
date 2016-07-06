@@ -1,10 +1,11 @@
 package main
 
 /*
+ * cgiscan.go
  * CGI program to synscan and banner the requestor
  * By J. Stuart McMurray
  * Created 20160704
- * Last Modified 20160704
+ * Last Modified 20160705
  */
 
 import (
