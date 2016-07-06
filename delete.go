@@ -27,7 +27,7 @@ func deleteResult(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	/* Remove entry from the database */
-	err := DB.Update(func(tx *bolt.Tx) error {
+	err = DB.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(RESBUCKET))
 		r := []byte(rip)
 		/* If we don't have saved results, give up */
