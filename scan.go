@@ -241,7 +241,7 @@ func handleScan(w http.ResponseWriter, req *http.Request) {
 being scanned */
 func enqueue(a string) {
 	/* Make sure we're not currently scanning */
-	if st, ok := SCANNING[a]; ok {
+	if _, ok := SCANNING[a]; ok {
 		debug("%v Being scanned")
 		return
 	}
@@ -258,13 +258,11 @@ func enqueue(a string) {
 	}
 	/* Add to the list */
 	/* This whole thing should probably be replaced by a circular buffer */
-	if add {
-		/* Enqueue */
-		QUEUE.PushBack(newQaddr(a))
-		/* Wake up a goroutine if one's waiting */
-		QCOND.Signal()
-		debug("%v Queued")
-	}
+	/* Enqueue */
+	QUEUE.PushBack(newQaddr(a))
+	/* Wake up a goroutine if one's waiting */
+	QCOND.Signal()
+	debug("%v Queued", a)
 }
 
 /* scanner pops an IP off the queue and scans it */
