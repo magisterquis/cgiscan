@@ -267,6 +267,7 @@ func handleScan(w http.ResponseWriter, req *http.Request) {
 	if nil != err {
 		w.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(w, err.Error())
+		return
 	}
 
 	/* Work out if we should scan it */
