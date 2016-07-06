@@ -24,9 +24,10 @@ import (
 
 /* Globals */
 var (
-	debug func(string, ...interface{}) /* Debug function */
-	DB    *bolt.DB                     /* Scan database */
-	START = time.Now()                 /* Server start time */
+	debug   func(string, ...interface{}) /* Debug function */
+	DB      *bolt.DB                     /* Scan database */
+	START   = time.Now()                 /* Server start time */
+	URLPATH string                       /* Leading bit of URL */
 )
 
 func main() {
@@ -91,8 +92,10 @@ Options:
 	}
 
 	/* Register handlers */
-	http.HandleFunc(*path, handleScan)
-	http.HandleFunc(*path+"/res/", query)
+	URLPATH = *path
+	http.HandleFunc(URLPATH, handleScan)
+	http.HandleFunc(URLPATH+"/res/", query)
+	http.HandleFunc(URLPATH+"/list", listScanned)
 
 	/* Open Database */
 	var err error
