@@ -5,7 +5,7 @@ package main
  * CGI program to synscan and banner the requestor
  * By J. Stuart McMurray
  * Created 20160704
- * Last Modified 20160705
+ * Last Modified 20160706
  */
 
 import (
@@ -100,6 +100,8 @@ Options:
 	http.HandleFunc(URLPATH+"/res/", query)
 	http.HandleFunc(URLPATH+"/list", listScanned)
 	http.HandleFunc(URLPATH+"/delete", deleteResult)
+	http.HandleFunc(URLPATH+"/help", help)
+	http.HandleFunc(URLPATH+"/queue", sendQueue)
 
 	/* Open Database */
 	var err error
