@@ -9,7 +9,6 @@ package main
  */
 
 import (
-	"container/list"
 	"flag"
 	"fmt"
 	"log"
@@ -18,7 +17,6 @@ import (
 	"net/http/fcgi"
 	"os"
 	"path/filepath"
-	"sync"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -30,23 +28,6 @@ var (
 	DB    *bolt.DB                     /* Scan database */
 	START = time.Now()                 /* Server start time */
 )
-
-/* qaddr is an address waiting in the queue, with the time it went in */
-type qaddr struct {
-	a string
-	t time.Time
-}
-
-/* newQaddr makes a qaddr with a time of now */
-func newQaddr(a string) qaddr { return qaddr{a: a, t: time.Now()} }
-
-func init() {
-	SCANNING = make(map[string]time.Time)
-	QUEUE = list.New()
-	QLOCK = &sync.Mutex{}
-	QCOND = sync.NewCond(QLOCK)
-	AVGLOCK = &sync.Mutex{}
-}
 
 func main() {
 	var (
