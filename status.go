@@ -91,8 +91,8 @@ func status(w http.ResponseWriter, req *http.Request) {
 <BODY>
 	<H1>CGIScan for %v</H1>
 	<P>More information at
-		<A HREF="https://github.com/magisterquis/cgiscan">
-			https://github.com/magisterquis/cgiscan
+		<A HREF="%v/help">
+			%v/help
 		</A>
 	</P>
 	<PRE>
@@ -111,6 +111,7 @@ Most recent scan results:
 </HTML>
 `,
 			ip,
+			URLPATH, URLPATH,
 			qmsg,
 			qlen,
 			time.Now().Sub(START),
@@ -119,7 +120,7 @@ Most recent scan results:
 			res,
 		),
 	)
-	debug("%v Reported status: %v", qmsg)
+	debug("%v Reported status: %v", ip, qmsg)
 }
 
 /* inQueue checks a's position in the queue, and returns whetehr it's being
