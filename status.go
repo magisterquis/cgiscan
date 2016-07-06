@@ -119,7 +119,7 @@ Most recent scan results:
 			res,
 		),
 	)
-	debug("%v Reported status", ip)
+	debug("%v Reported status: %v", qmsg)
 }
 
 /* inQueue checks a's position in the queue, and returns whetehr it's being
