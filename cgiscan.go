@@ -248,7 +248,7 @@ func handle(w http.ResponseWriter, req *http.Request) {
 	if started { /* Report that we're scanning */
 		st := startTime.UTC().Format(time.RFC3339) /* Start Time */
 		qmsg = fmt.Sprintf(
-			"Scanning now.  Start time %v (%v ago)",
+			"Scanning now.  Start time %v (%v ago).",
 			st,
 			wt,
 		)
