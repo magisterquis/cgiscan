@@ -21,10 +21,10 @@ import (
 /* Query returns the last scan results for a given IP */
 func query(w http.ResponseWriter, req *http.Request) {
 	/* Pull out query address, if any */
-	parts := strings.Split(req.URL.path, "/")
+	parts := strings.Split(req.URL.Path, "/")
 	addr := parts[len(parts)-1]
 	/* Usage */
-	if nil == net.ParseIP(a) {
+	if nil == net.ParseIP(addr) {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(
 			"No IP address specified.  The last element of the " +
@@ -38,10 +38,21 @@ func query(w http.ResponseWriter, req *http.Request) {
 		io.WriteString(w, err.Error())
 		return
 	}
+
+	/* Requestor's IP */
+	ip, _, err := net.SplitHostPort(req.RemoteAddr)
+	if nil != err {
+		w.WriteHeader(http.StatusInternalServerError)
+		io.WriteString(w, err.Error())
+		return
+	}
+
 	/* No result */
 	if nil == res {
 		io.WriteString(w, fmt.Sprintf("No scan results for %v", addr))
+		debug("%v sent no report for %v", ip, addr)
 	}
+	debug("%v sent report for %v", ip, addr)
 	w.Write(res)
 }
 
