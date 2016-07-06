@@ -52,8 +52,29 @@ func query(w http.ResponseWriter, req *http.Request) {
 		io.WriteString(w, fmt.Sprintf("No scan results for %v", addr))
 		debug("%v sent no report for %v", ip, addr)
 	}
+
+	/* Send result */
+	if _, err := w.Write([]byte(fmt.Sprintf(`<!DOCTYPE HTML>
+<HEAD>
+	<TITLE>CGIS:%v</TITLE>
+	<STYLE TYPE="text/css"><!--
+		body {
+			background-color: white;
+			color: black;
+			font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
+		}
+	--></STYLE>
+</HEAD>
+<BODY>
+<H1>Scan Result for %v</H1>
+<PRE>`, addr, addr))); nil != err {
+		return
+	}
+	if _, err := w.Write(res); nil != err {
+		return
+	}
+	io.WriteString(w, "\n</PRE>\n</BODY>\n<HTML>\n")
 	debug("%v sent report for %v", ip, addr)
-	w.Write(res)
 }
 
 /* lastRes gets the last results for the scanned IP */
@@ -73,3 +94,5 @@ func lastRes(ip string) ([]byte, error) {
 	})
 	return res, err
 }
+
+/* TODO: Help text */
