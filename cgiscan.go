@@ -23,6 +23,7 @@ import (
 )
 
 /* Globals */
+const RESBUCKET = "Results" /* Bucket name for results */
 var (
 	debug   func(string, ...interface{}) /* Debug function */
 	DB      *bolt.DB                     /* Scan database */
@@ -93,7 +94,9 @@ Options:
 
 	/* Register handlers */
 	URLPATH = *path
-	http.HandleFunc(URLPATH, handleScan)
+	http.HandleFunc(URLPATH, status)
+	http.HandleFunc(URLPATH+"/status", status)
+	http.HandleFunc(URLPATH+"/scan", handleScan)
 	http.HandleFunc(URLPATH+"/res/", query)
 	http.HandleFunc(URLPATH+"/list", listScanned)
 	http.HandleFunc(URLPATH+"/delete", deleteResult)

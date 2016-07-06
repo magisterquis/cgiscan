@@ -40,47 +40,7 @@ type qaddr struct {
 /* newQaddr makes a qaddr with a time of now */
 func newQaddr(a string) qaddr { return qaddr{a: a, t: time.Now()} }
 
-const (
-	/* Scan Response template */
-	SCANRES = `<!DOCTYPE HTML>
-<HTML>
-<HEAD>
-	<TITLE>CGIScan</TITLE>
-	<STYLE TYPE="text/css"><!--
-		body {
-			background-color: white;
-			color: black;
-			font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-		}
-		p {
-			font-size: xx-small;
-		}
-	--></STYLE>
-</HEAD>
-<BODY>
-	<H1>CGIScan for %v</H1>
-	<P>More information at
-		<A HREF="https://github.com/magisterquis/cgiscan">
-			https://github.com/magisterquis/cgiscan
-		</A>
-	</P>
-	<PRE>
-%v
-
-     Queue length: %v
-   Service uptime: %v
-  Completed scans: %v
-Average scan time: %v
-
-Most recent scan results:
-
-%s
-</PRE>
-</BODY>
-</HTML>
-`
-	RESBUCKET = "Results" /* Bucket name for results */
-)
+const ()
 
 /* Target queue */
 var (
@@ -270,119 +230,41 @@ func handleScan(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	/* Work out if we should scan it */
-	scan, err := shouldScan(req)
-	if nil != err {
-		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, err.Error())
+	/* Queue it up */
+	enqueue(ip)
+
+	/* Redirect back */
+	http.Redirect(w, req, URLPATH, http.StatusSeeOther)
+}
+
+/* enqueue adds the address to the scan queue if it's not already there (or
+being scanned */
+func enqueue(a string) {
+	/* Make sure we're not currently scanning */
+	if st, ok := SCANNING[a]; ok {
+		debug("%v Being scanned")
 		return
 	}
-
-	/* If we're meant to scan, queue it up */
-	var qmsg string
-	started, startTime, qpos, qlen := enqueue(ip, scan)
-	wt := time.Now().Sub(startTime) /* Time since startTime */
-	/* Come up with a helpful message */
-	if started { /* Report that we're scanning */
-		st := startTime.UTC().Format(time.RFC3339) /* Start Time */
-		qmsg = fmt.Sprintf(
-			"Scanning now.  Start time %v (%v ago).",
-			st,
-			wt,
-		)
-		debug("%v Reporting running since %v (%v)", ip, st, wt)
-	} else if scan { /* Report queue position */
-		qmsg = fmt.Sprintf(
-			"Queue position: %v (waiting %v)",
-			qpos,
-			wt,
-		)
-		debug(
-			"%v Reporting queued in position %v (%v)",
-			ip,
-			qpos,
-			wt,
-		)
-	} else { /* Report last results */
-		u := req.URL.String() + "?yes"
-		qmsg = fmt.Sprintf("<A HREF=\"%v\">%v</A> to (re)scan", u, u)
-		debug("%v Reporting results", ip)
-	}
-
-	/* Get the last results */
-	res, err := lastRes(ip)
-	if nil != err {
-		res = []byte(fmt.Sprintf("ERROR: %v", err))
-	}
-	if nil == res || 0 == len(res) {
-		res = []byte("\nNo results.")
-	}
-
-	/* Return them */
-	io.WriteString(
-		w,
-		fmt.Sprintf(
-			SCANRES,
-			ip,
-			qmsg,
-			qlen,
-			time.Now().Sub(START), NSCAN, AVGTIME,
-			res,
-		),
-	)
-}
-
-/* shouldScan returns true if a scan was requested */
-func shouldScan(req *http.Request) (bool, error) {
-	/* Parse form values */
-	if err := req.ParseForm(); nil != err {
-		return false, err
-	}
-
-	/* Work out whether a scan is requested */
-	if _, ok := req.Form["yes"]; ok {
-		return true, nil
-	}
-	return false, nil
-}
-
-/* enqueue optionally puts the address in the queue for scanning, and returns
-the position in the queue as well as the length of the queue. */
-func enqueue(
-	a string,
-	add bool,
-) (started bool, startTime time.Time, pos, len int) {
-	/* TODO: Make this function do one thing and do it well */
-	/* This whole thing should probably be replaced by a circular buffer */
-	QLOCK.Lock()
-	defer QLOCK.Unlock()
-	/* If we're already started, easy day */
-	if st, ok := SCANNING[a]; ok {
-		return true, st, 0, QUEUE.Len()
-	}
-	/* Make sure we're not in the queue already */
-	pos = 1
+	/* Make sure we're not in the queue */
+	pos := 1
 	for e := QUEUE.Front(); nil != e; e = e.Next() {
 		q := e.Value.(qaddr)
 		/* If we are, report the position */
 		if q.a == a {
-			return false, q.t, pos, QUEUE.Len()
+			debug("%v In queue, position %v", a, pos)
+			return
 		}
 		pos++
 	}
-	/* Not in the queue, not running, maybe add it */
+	/* Add to the list */
+	/* This whole thing should probably be replaced by a circular buffer */
 	if add {
-		q := newQaddr(a)
 		/* Enqueue */
-		QUEUE.PushBack(q)
+		QUEUE.PushBack(newQaddr(a))
 		/* Wake up a goroutine if one's waiting */
 		QCOND.Signal()
-		return false, q.t, QUEUE.Len(), QUEUE.Len()
-	} else {
-		/* Not running, not queued, don't add it */
-		return false, time.Time{}, 0, QUEUE.Len()
+		debug("%v Queued")
 	}
-	/* TODO: Check again if we're being scanned */
 }
 
 /* scanner pops an IP off the queue and scans it */
