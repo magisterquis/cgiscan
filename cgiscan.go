@@ -562,7 +562,7 @@ func openPortsReport(m map[int][]byte, start time.Time) []byte {
 permissions of the socket to perm.  The socket will be removed if it exists. */
 func listenUnix(path string, perm os.FileMode) (net.Listener, error) {
 	/* Remove the socket if it exists */
-	if _, err := os.Stat("/path/to/whatever"); err == nil {
+	if _, err := os.Stat(path); err == nil {
 		if err := os.Remove(path); nil != err {
 			return nil, err
 		}
