@@ -45,7 +45,7 @@ func deleteResult(w http.ResponseWriter, req *http.Request) {
 		debug("%v Failed to delete saved results: %v", rip, err)
 		return
 	}
-	io.WriteString(w, "Deleted saved results.\n")
+	io.WriteString(w, fmt.Sprintf("Deleted saved results for %v.\n", rip))
 	debug("%v Deleted saved results", rip)
 
 }
