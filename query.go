@@ -67,7 +67,8 @@ func query(w http.ResponseWriter, req *http.Request) {
 </HEAD>
 <BODY>
 <H1>Scan Result for %v</H1>
-<PRE>`, addr, addr))); nil != err {
+<PRE>
+`, addr, addr))); nil != err {
 		return
 	}
 	if _, err := w.Write(res); nil != err {
