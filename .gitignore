@@ -27,3 +27,7 @@ _testmain.go
 cgiscan
 cgiscan.*.*
 
+# For testing
+cert.pem
+key.pem
+db
