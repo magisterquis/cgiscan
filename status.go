@@ -129,7 +129,6 @@ queue length */
 func inQueue(
 	a string,
 ) (queued, started bool, startTime time.Time, qpos, qlen int) {
-	/* TODO: Make this function do one thing and do it well */
 	/* This whole thing should probably be replaced by a circular buffer */
 	QLOCK.Lock()
 	defer QLOCK.Unlock()

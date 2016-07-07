@@ -95,5 +95,3 @@ func lastRes(ip string) ([]byte, error) {
 	})
 	return res, err
 }
-
-/* TODO: Help text */

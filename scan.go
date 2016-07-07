@@ -55,7 +55,6 @@ var (
 	NSCAN   int           /* Number scanned */
 	AVGTIME time.Duration /* Average scan time */
 	AVGLOCK *sync.Mutex   /* Average scan time lock */
-	/* TODO: Use NSCAN and AVGTIME */
 )
 
 func init() {
@@ -308,5 +307,3 @@ func updateAverages(sd time.Duration) {
 		time.Duration(NSCAN+1)
 	NSCAN++
 }
-
-/* TODO: Redirect back to non-?yes */
