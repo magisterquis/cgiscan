@@ -11,6 +11,9 @@ up servers, VMs, etc..  After a scan has been requested, it's status can be
 queried by accessing the same URL.  Scans take aroud 15 minutes.  This can be
 sped up with the `-n` parameter at the cost of increased resource usage.
 
+It can also run as a [standalone](#standalone-operation) HTTPS server, given a
+TLS certificate and key.
+
 Setup
 -----
 The below directions are for OpenBSD's `httpd(8)`.  Please adjust for your
@@ -60,6 +63,19 @@ Configuration
 -------------
 All configuration is performed via the command line.  Pass the `-h` flag to see
 the available options.
+
+Standalone Operation
+--------------------
+Besides running as a FastCGI service, cgiscan can run as a standalone HTTPS
+server.  To do this, it requires a TLS certificate and key.  It should probably
+be started something like
+```sh
+./cgiscan -d -s 0.0.0.0:7733 -p / -https -cert /your/cert.pem -key /your/key.pem -db /your/db.pem
+```
+Of note is `-p /`, which prevents users from having to prepend `/cgiscan` to
+all URL paths.  It is not necessary to specify `-d`, but it displays a
+reasonable amount of logging data.  Log rotation is probably a good idea,
+however.
 
 Binaries
 --------

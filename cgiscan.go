@@ -9,6 +9,7 @@ package main
  */
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
@@ -64,6 +65,21 @@ func main() {
 			128,
 			"Scan `count` ports in parallel",
 		)
+		serveHTTPS = flag.Bool(
+			"https",
+			false,
+			"Serve HTTPS instead of FastCGI",
+		)
+		certFile = flag.String(
+			"cert",
+			"cert.pem",
+			"TLS cert used if -https is given",
+		)
+		keyFile = flag.String(
+			"key",
+			"key.pem",
+			"TLS key used if -https is given",
+		)
 	)
 	flag.Usage = func() {
 		fmt.Fprintf(
@@ -93,8 +109,12 @@ Options:
 	}
 
 	/* Register handlers */
-	URLPATH = *path
-	http.HandleFunc(URLPATH, status)
+	if "/" == *path {
+		http.HandleFunc("/", status)
+	} else {
+		URLPATH = *path
+		http.HandleFunc(URLPATH, status)
+	}
 	http.HandleFunc(URLPATH+"/status", status)
 	http.HandleFunc(URLPATH+"/scan", handleScan)
 	http.HandleFunc(URLPATH+"/res/", query)
@@ -127,6 +147,9 @@ Options:
 	/* Listen for FastCGI connections */
 	var l net.Listener
 	if "-" == *sock {
+		if *serveHTTPS {
+			log.Fatalf("Can't serve https via stdio")
+		}
 		log.Printf("Listening on standard i/o")
 	} else if *tcp {
 		l, err = net.Listen("tcp", *sock)
@@ -137,6 +160,7 @@ Options:
 		log.Fatalf("Unable to listen on %v: %v", *sock, err)
 	}
 	if "-" == *sock {
+		/* TODO: Delete this */
 		log.Printf("Listening on stdio")
 	} else {
 		log.Printf("Listening on %v", l.Addr())
@@ -145,10 +169,18 @@ Options:
 	/* Start scanner */
 	go scanner(*nAttempt)
 
-	/* Serve up scans */
-	if err := fcgi.Serve(l, nil); nil != err {
+	/* Serve up HTTPS or FastCGI */
+	if *serveHTTPS {
+		err = https(l, *certFile, *keyFile)
+	} else {
+		err = fcgi.Serve(l, nil)
+	}
+
+	/* Tell the user we're done.  This shouldn't happen much */
+	if nil != err {
 		log.Fatalf("Error: %v", err)
 	}
+	log.Printf("Done.  This is a bug.")
 }
 
 /* ListenUnix tries to listen on a unix socket.  If successful, it sets the
@@ -171,6 +203,22 @@ func listenUnix(path string, perm os.FileMode) (net.Listener, error) {
 	}
 
 	return l, nil
+}
+
+/* https serves up HTTPS responses, as opposed to FCGI */
+func https(l net.Listener, certFile, keyFile string) error {
+	/* Load cert and key */
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if nil != err {
+		return err
+	}
+
+	/* Upgrade listener to a TLS'd listener */
+	tl := tls.NewListener(l, &tls.Config{
+		Certificates: []tls.Certificate{cert},
+	})
+
+	return http.Serve(tl, nil)
 }
 
 /* TODO: Max queue length */
