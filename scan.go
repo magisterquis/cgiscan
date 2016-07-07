@@ -242,7 +242,7 @@ being scanned */
 func enqueue(a string) {
 	/* Make sure we're not currently scanning */
 	if _, ok := SCANNING[a]; ok {
-		debug("%v Being scanned")
+		debug("%v Being scanned", a)
 		return
 	}
 	/* Make sure we're not in the queue */
