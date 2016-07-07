@@ -159,10 +159,7 @@ Options:
 	if nil != err {
 		log.Fatalf("Unable to listen on %v: %v", *sock, err)
 	}
-	if "-" == *sock {
-		/* TODO: Delete this */
-		log.Printf("Listening on stdio")
-	} else {
+	if nil != l {
 		log.Printf("Listening on %v", l.Addr())
 	}
 
