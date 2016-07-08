@@ -5,7 +5,7 @@ package main
  * Query for an IP's last scan
  * By J. Stuart McMurray
  * Created 20160705
- * Last Modified 20160706
+ * Last Modified 20160708
  */
 
 import (
@@ -51,6 +51,7 @@ func query(w http.ResponseWriter, req *http.Request) {
 	if nil == res {
 		io.WriteString(w, fmt.Sprintf("No scan results for %v", addr))
 		debug("%v sent no report for %v", ip, addr)
+		return
 	}
 
 	/* Send result */
