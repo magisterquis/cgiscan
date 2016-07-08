@@ -5,7 +5,7 @@ package main
  * CGI program to synscan and banner the requestor
  * By J. Stuart McMurray
  * Created 20160704
- * Last Modified 20160706
+ * Last Modified 20160708
  */
 
 import (
@@ -79,6 +79,11 @@ func main() {
 			"key",
 			"key.pem",
 			"TLS key used if -https is given",
+		)
+		qsockPath = flag.String(
+			"q",
+			"",
+			"Unix domain socket path for local queuing",
 		)
 	)
 	flag.Usage = func() {
@@ -161,6 +166,11 @@ Options:
 	}
 	if nil != l {
 		log.Printf("Listening on %v", l.Addr())
+	}
+
+	/* Maybe listen for local queues, as well */
+	if "" != *qsockPath {
+		go qsock(*qsockPath)
 	}
 
 	/* Start scanner */

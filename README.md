@@ -77,6 +77,23 @@ all URL paths.  It is not necessary to specify `-d`, but it displays a
 reasonable amount of logging data.  Log rotation is probably a good idea,
 however.
 
+Scanning Arbitrary IP Addresses
+-------------------------------
+Scans for arbitrary IP addresses can be queued via an option Unix domain
+socket, specified with the `-q` flag.
+```bash
+# Fire off cgiscan
+./cgiscan -https -t -s localhost:7733 -db ./db -d -p / -q ./q.sock
+
+# Queue up an address
+nc -U 192.168.0.1 | nc -U ./q.sock
+```
+This allows for somewhat easy collaboration during security assessments, as a
+less noisy alternative to [fastscan](https://github.com/magisterquis/fastscan).
+
+In the future it may be possible to queue arbitrary addresses via a GET request
+as well.
+
 Binaries
 --------
 Binaries, even for Windows, can be made available upon request.  I can usually
