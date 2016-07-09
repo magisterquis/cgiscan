@@ -101,5 +101,4 @@ be found on Freenode with the nick `magisterquis`.
 
 Windows
 -------
-Should probably work.  It could even be made into a standalone webserver
-without too much fuss.
+Should probably work except the Unix socket for local queuing.
